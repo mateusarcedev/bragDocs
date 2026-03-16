@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ReactMarkdown from 'react-markdown';
 import type { AnalysisType, AIModel } from '@brag-docs/shared';
+import { getErrorMessage } from '@/lib/utils';
 
 export function AIAnalysis() {
   const [models, setModels] = useState<AIModel[]>([]);
@@ -33,9 +34,9 @@ export function AIAnalysis() {
         model: selectedModel
       });
       setResult(response.result);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      setResult(`Error: ${e.message}`);
+      setResult(`Erro: ${getErrorMessage(e)}`);
     } finally {
       setAnalyzing(false);
     }

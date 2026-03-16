@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Entry } from '@brag-docs/shared';
+import { getErrorMessage } from '@/lib/utils';
 
 export function DocView() {
   const params = useParams();
@@ -33,8 +34,8 @@ export function DocView() {
       try {
         const data = await api.getEntry(entryId);
         if (!cancelled) setEntry(data);
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message ?? 'Falha ao carregar a entry.');
+      } catch (e: unknown) {
+        if (!cancelled) setError(getErrorMessage(e) ?? 'Falha ao carregar a entry.');
       } finally {
         if (!cancelled) setLoading(false);
       }

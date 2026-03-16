@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { api } from '@/lib/api';
 import type { Entry, Metrics, SettingsPublic } from '@brag-docs/shared';
+import { getErrorMessage } from '@/lib/utils';
 
 interface AppState {
   settings: SettingsPublic;
@@ -27,8 +28,8 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       const settings = await api.getSettings();
       set({ settings });
-    } catch (e: any) {
-      set({ error: e.message });
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e) });
     }
   },
 
@@ -40,8 +41,8 @@ export const useStore = create<AppState>((set, get) => ({
           ? { ...state.settings, ai_token_set: key === 'ai_token' ? true : state.settings.ai_token_set }
           : { ...state.settings, [key]: value }
       }));
-    } catch (e: any) {
-      set({ error: e.message });
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e) });
     }
   },
 
@@ -50,8 +51,8 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       await api.sync();
       await get().fetchData();
-    } catch (e: any) {
-      set({ error: e.message });
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e) });
     } finally {
       set({ loading: false });
     }
@@ -63,8 +64,8 @@ export const useStore = create<AppState>((set, get) => ({
       await api.importSync(files);
       await get().fetchSettings();
       await get().fetchData();
-    } catch (e: any) {
-      set({ error: e.message });
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e) });
     } finally {
       set({ loading: false });
     }
@@ -78,8 +79,8 @@ export const useStore = create<AppState>((set, get) => ({
         api.getMetrics(filters)
       ]);
       set({ entries, metrics });
-    } catch (e: any) {
-      set({ error: e.message });
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e) });
     } finally {
       set({ loading: false });
     }

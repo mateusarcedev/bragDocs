@@ -15,8 +15,9 @@ const app = Fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
+const webOrigin = process.env.WEB_ORIGIN ?? 'http://localhost:5173';
 app.register(cors, {
-  origin: 'http://localhost:5173'
+  origin: webOrigin
 });
 
 app.register(settingsRoutes);
@@ -28,8 +29,10 @@ app.register(aiRoutes);
 const start = async () => {
   try {
     initDb();
-    await app.listen({ port: 3001, host: '0.0.0.0' });
-    console.log('Server listening on http://localhost:3001');
+    const port = Number(process.env.PORT ?? 8089);
+    const host = process.env.HOST ?? '0.0.0.0';
+    await app.listen({ port, host });
+    console.log(`Server listening on http://${host}:${port}`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);

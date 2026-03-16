@@ -1,0 +1,24 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: "8089"
+      HOST: "0.0.0.0"
+      WEB_ORIGIN: "http://localhost:8088"
+      DB_PATH: "/data/brag-docs.db"
+    volumes:
+      - ./data:/data
+      - ./data/vault-imports:/app/apps/api/vault-imports
+    ports:
+      - "8089:8089"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8088:80"

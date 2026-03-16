@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { getErrorMessage } from '@/lib/utils';
 
 export function SettingsPage() {
   const { settings, fetchSettings, updateSetting, syncVault, importVault, loading, error } = useStore();
@@ -51,7 +52,7 @@ export function SettingsPage() {
 
       const payload: Array<{ file_path: string; raw_content: string }> = [];
       for (const f of files) {
-        const filePath = (f as any).webkitRelativePath || f.name;
+        const filePath = f.webkitRelativePath || f.name;
         const raw = await f.text();
         payload.push({ file_path: filePath, raw_content: raw });
       }
@@ -59,8 +60,8 @@ export function SettingsPage() {
       setImportInfo(`Importando ${payload.length} arquivos...`);
       await importVault(payload);
       setImportInfo('Importação concluída. O vault foi salvo no caminho absoluto da aplicação.');
-    } catch (e: any) {
-      setImportInfo(e?.message ?? 'Falha ao importar.');
+    } catch (e: unknown) {
+      setImportInfo(getErrorMessage(e) ?? 'Falha ao importar.');
     } finally {
       setImporting(false);
       if (importInputRef.current) importInputRef.current.value = '';
@@ -105,7 +106,7 @@ export function SettingsPage() {
                 ref={importInputRef}
                 type="file"
                 multiple
-                {...({ webkitdirectory: '', directory: '' } as any)}
+                {...({ webkitdirectory: '', directory: '' } as unknown as Record<string, string>)}
                 className="hidden"
                 onChange={(e) => handleImportSelected(e.target.files)}
               />
@@ -122,10 +123,10 @@ export function SettingsPage() {
           </div>
         </CardContent>
         <CardFooter>
-            <Button variant="outline" onClick={() => syncVault()} disabled={loading}>
-                {loading ? 'Sincronizando...' : 'Sincronizar agora'}
-            </Button>
-            {error && <p className="ml-4 text-red-500 text-sm">{error}</p>}
+          <Button variant="outline" onClick={() => syncVault()} disabled={loading}>
+            {loading ? 'Sincronizando...' : 'Sincronizar agora'}
+          </Button>
+          {error && <p className="ml-4 text-red-500 text-sm">{error}</p>}
         </CardFooter>
       </Card>
 
@@ -141,7 +142,7 @@ export function SettingsPage() {
                 id="ai_host"
                 value={localSettings.ai_host || ''}
                 onChange={(e) => handleChange('ai_host', e.target.value)}
-                placeholder="http://localhost:3000"
+                placeholder="http://localhost:8080"
               />
               <Button onClick={() => handleSave('ai_host')} disabled={loading}>
                 Salvar
