@@ -1,0 +1,4 @@
+node_modules/
+dist/
+brag-docs.db
+vault-imports/
